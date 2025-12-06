@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+    # 1. سرویس دیتابیس (MariaDB که با MySQL کاملا سازگار است)
+    db:
+        image: mariadb:10.11 # نسخه پایدار و مطمئن
+        container_name: tods_mariadb
+        restart: always
+        environment:
+            # از این مقادیر در .env محلی استفاده نکنید، این‌ها برای داخل کانتینر هستند
+            MARIADB_DATABASE: ${DB_DATABASE}
+            MARIADB_USER: ${DB_USERNAME}
+            MARIADB_PASSWORD: ${DB_PASSWORD}
+            MARIADB_ROOT_PASSWORD: the@Str*1597#PASS # رمز روت را تغییر دهید
+        volumes:
+            # دیتابیس را روی سیستم محلی ذخیره می‌کند تا با حذف کانتینر از بین نرود
+            - db-data:/var/lib/mysql
+        # این دیتابیس فقط برای سرویس‌های داخلی قابل دسترسی است و پورتش منتشر نمی‌شود
+
+    # 2. سرویس برنامه لاراول (PHP-FPM)
+    app:
+        build:
+            context: . # از Dockerfile در همین دایرکتوری استفاده کن
+            dockerfile: Dockerfile
+        container_name: tods_app
+        restart: always
+        volumes:
+            # کدهای محلی را برای توسعه و تغییر لحظه‌ای به داخل کانتینر مپ می‌کند
+            - .:/var/www/html
+        environment:
+            # اینجا متغیرهای محیطی که اپلیکیشن داخل کانتینر نیاز دارد، تعریف می‌شود
+            # DB_HOST به نام سرویس دیتابیس (db) تغییر داده شده است!
+            DB_HOST: db
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+        depends_on:
+            - db # مطمئن می‌شود که دیتابیس قبل از اپلیکیشن بالا بیاید
+
+    # 3. سرویس وب‌سرور (Nginx)
+    nginx:
+        image: nginx:stable-alpine
+        container_name: tods_nginx
+        restart: always
+        ports:
+            # مپ کردن پورت 80 سرور به پورت 80 کانتینر Nginx
+            - "80:80"
+        volumes:
+            # مپ کردن کدهای اپلیکیشن به Nginx
+            - .:/var/www/html
+            # مپ کردن فایل کانفیگ Nginx سفارشی
+            - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - app # مطمئن می‌شود که سرویس PHP-FPM قبل از Nginx بالا بیاید
+
+# تعریف Volume برای ذخیره دائمی اطلاعات دیتابیس
+volumes:
+    db-data: ~
