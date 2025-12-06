@@ -11,7 +11,7 @@
 
         @error('phone')
             <span class="error">
-                کاربر یافت نشد
+                {{ $message }}
             </span>
         @enderror
     </form>

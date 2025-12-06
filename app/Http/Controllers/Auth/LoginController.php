@@ -35,6 +35,11 @@ class LoginController extends Controller
             return back()->withErrors(['phone' => 'کاربری با این شماره یافت نشد.']);
         }
 
+        // check if the previuous code is still valid (e.g., within 2 minutes)
+        if ($user->verification_code && $user->updated_at->gt(now()->subMinutes(2))) {
+            return back()->withErrors(['phone' => 'لطفا ۲ دقیقه دیگر مجددا تلاش فرمایید.']);
+        }
+
         // تولید کد تأیید (۴ یا ۵ رقمی)
         $code = rand(1000, 9999);
 
