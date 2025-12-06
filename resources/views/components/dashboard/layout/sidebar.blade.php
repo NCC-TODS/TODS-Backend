@@ -49,7 +49,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="pages/mailbox/read-mail.html" class="nav-link">
+                                <a href="{{ route('dashboard.usermanage.list-users') }}" class="nav-link">
                                     <i class="fa fa-list-ul nav-icon"></i>
                                     <p>همه کاربران</p>
                                 </a>
