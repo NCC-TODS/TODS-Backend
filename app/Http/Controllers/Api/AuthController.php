@@ -35,6 +35,13 @@ class AuthController extends Controller
             ], 403);
         }
 
+        // check if the previuous code is still valid (e.g., within 2 minutes)
+        if ($user->verification_code && $user->updated_at->gt(now()->subMinutes(2))) {
+            return response()->json([
+                'message' => '104' // code still valid
+            ], 200);
+        }
+
         // تولید کد تأیید (مثلاً ۵ رقمی)
         $code = rand(1000, 9999);
 
