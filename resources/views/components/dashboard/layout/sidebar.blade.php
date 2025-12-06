@@ -43,7 +43,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="pages/mailbox/compose.html" class="nav-link">
+                                <a href="{{ route('dashboard.usermanage.show-create-user') }}" class="nav-link">
                                     <i class="fa fa-plus nav-icon"></i>
                                     <p>کاربر جدید</p>
                                 </a>

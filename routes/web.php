@@ -53,5 +53,8 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => 'au
         Route::get('/', [UsermanageController::class, 'list_users'])->name('list-users');
         Route::get('/edit/{id}', [UsermanageController::class, 'edit_user'])->name('edit-user');
         Route::put('/update/{id}', [UsermanageController::class, 'update_user'])->name('update-user');
+
+        Route::get('/create', [UsermanageController::class, 'show_create_user'])->name('show-create-user');
+        Route::post('/create', [UsermanageController::class, 'create_user_action'])->name('create-user-action');
     });
 });
