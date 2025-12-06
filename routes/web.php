@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Dashboard\UsermanageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -46,4 +47,11 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => 'au
     Route::get('/', function () {
         return view('dashboard.main');
     })->name('main');
+
+    // User Management Routes
+    Route::group(['prefix' => 'usermanage', 'as' => 'usermanage.', 'middleware' => 'auth'], function () {
+        Route::get('/', [UsermanageController::class, 'list_users'])->name('list-users');
+        Route::get('/edit/{id}', [UsermanageController::class, 'edit_user'])->name('edit-user');
+        Route::put('/update/{id}', [UsermanageController::class, 'update_user'])->name('update-user');
+    });
 });
