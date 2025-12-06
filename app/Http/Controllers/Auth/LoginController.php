@@ -44,6 +44,7 @@ class LoginController extends Controller
         $code = rand(1000, 9999);
 
         $user->verification_code = $code;
+        $user->verify_tries = 0;
         $user->save();
 
         //ارسال پیامک (فعلاً شبیه‌سازی شده)
@@ -90,10 +91,21 @@ class LoginController extends Controller
         }
 
         if ($user->verification_code !== $request->code) {
+            $user->verify_tries += 1;
+            $user->save();
+
+            if ($user->verify_tries > 3) {
+                // بلاک کردن کاربر یا اقدامات امنیتی دیگر
+                $user->verification_code = null;
+                $user->save();
+                session()->forget('phone');
+                return redirect()->route('auth.login')->withErrors(['phone' => 'تعداد تلاش‌های ناموفق زیاد بود. لطفا دوباره وارد شوید.']);
+            }
             return redirect()->route('auth.showverifycode')->with('status', 'کد وارد شده اشتباه است.');
         }
 
         $user->verification_code = null;
+        $user->verify_tries = 0;
         $user->save();
 
         Auth::login($user);
