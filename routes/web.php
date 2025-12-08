@@ -5,7 +5,8 @@ use App\Http\Controllers\Dashboard\UsermanageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // Redirect to login page
+    return redirect()->route('auth.login');
 });
 
 
