@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tods-backend-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - tods-network
+    ports:
+      - "8000:80"
+    env_file:
+      - .env.development
+    depends_on:
+      - database
+    command: >
+      sh -c "chown -R nginx:nginx /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true &&
+             composer install --optimize-autoloader &&
+             php artisan key:generate --force 2>/dev/null || true &&
+             php artisan config:clear &&
+             php artisan cache:clear &&
+             php artisan view:clear &&
+             /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"
+
+  database:
+    image: mariadb:11-alpine
+    container_name: tods-backend-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-tods_db}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${DB_USERNAME:-tods_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - tods-network
+    ports:
+      - "127.0.0.1:3306:3306"
+    command: --bind-address=0.0.0.0 --skip-networking=0
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tods-backend-redis
+    restart: unless-stopped
+    networks:
+      - tods-network
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  tods-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+

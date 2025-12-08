@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tods-backend-app-prod
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+    networks:
+      - tods-network
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - .env.production
+    depends_on:
+      - database
+    command: >
+      sh -c "chown -R nginx:nginx /var/www/html/storage /var/www/html/bootstrap/cache &&
+             php artisan config:cache &&
+             php artisan route:cache &&
+             php artisan view:cache &&
+             php artisan event:cache &&
+             php artisan optimize &&
+             /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"
+
+  database:
+    image: mariadb:11-alpine
+    container_name: tods-backend-db-prod
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-tods_db}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME:-tods_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data_prod:/var/lib/mysql
+    networks:
+      - tods-network
+    # Database only accessible internally, not exposed to host
+    expose:
+      - "3306"
+    command: >
+      --bind-address=0.0.0.0
+      --skip-networking=0
+      --innodb-buffer-pool-size=512M
+      --max-connections=200
+      --query-cache-size=64M
+      --query-cache-type=1
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: tods-backend-redis-prod
+    restart: always
+    networks:
+      - tods-network
+    # Redis only accessible internally, not exposed to host
+    expose:
+      - "6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save 60 1000
+    volumes:
+      - redis_data_prod:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  tods-network:
+    driver: bridge
+    internal: false
+
+volumes:
+  db_data_prod:
+    driver: local
+  redis_data_prod:
+    driver: local
+
