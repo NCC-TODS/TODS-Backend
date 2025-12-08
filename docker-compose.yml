@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -21,15 +19,16 @@ services:
       - database
     command: >
       sh -c "chown -R nginx:nginx /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true &&
-             composer install --optimize-autoloader &&
+             rm -f /var/www/html/bootstrap/cache/config.php 2>/dev/null || true &&
+             rm -f /var/www/html/bootstrap/cache/routes-v7.php 2>/dev/null || true &&
+             mkdir -p /var/run && chmod 777 /var/run &&
+             rm -f /var/run/php-fpm.sock 2>/dev/null || true &&
+             composer install --optimize-autoloader 2>/dev/null || true &&
              php artisan key:generate --force 2>/dev/null || true &&
-             php artisan config:clear &&
-             php artisan cache:clear &&
-             php artisan view:clear &&
-             /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"
+             /usr/local/bin/entrypoint.sh"
 
   database:
-    image: mariadb:11-alpine
+    image: mariadb:10.11
     container_name: tods-backend-db
     restart: unless-stopped
     environment:
@@ -49,23 +48,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  redis:
-    image: redis:7-alpine
-    container_name: tods-backend-redis
-    restart: unless-stopped
-    networks:
-      - tods-network
-    ports:
-      - "127.0.0.1:6379:6379"
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      start_period: 10s
 
 networks:
   tods-network:
@@ -73,7 +56,5 @@ networks:
 
 volumes:
   db_data:
-    driver: local
-  redis_data:
     driver: local
 
