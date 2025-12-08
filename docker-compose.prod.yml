@@ -35,9 +35,11 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-tods_db}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      # WARNING: Change these default passwords in production!
+      # Set DB_ROOT_PASSWORD and DB_PASSWORD in .env.production
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-CHANGE_ME_ROOT_PASSWORD}
       MYSQL_USER: ${DB_USERNAME:-tods_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-CHANGE_ME_PASSWORD}
     volumes:
       - db_data_prod:/var/lib/mysql
     networks:
