@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\NRP\FetchOveralFormController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('auth')->group(function () {
+Route::prefix('auth')->middleware('EnsureTokenIsValid')->group(function () {
     Route::post('/request-code', [AuthController::class, 'requestCode']);
     Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 });
@@ -13,7 +13,7 @@ Route::prefix('auth')->group(function () {
 Route::group([
     'as' => 'nrp.',
     'prefix' => 'nrp',
-    'middleware' => 'auth:sanctum'
+    'middleware' => ['auth:sanctum', 'EnsureTokenIsValid'],
 ], function () {
 
     // Fetch states list
