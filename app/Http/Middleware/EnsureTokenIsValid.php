@@ -15,6 +15,12 @@ class EnsureTokenIsValid
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $key = $request->input('x-api-key');
+
+        if (empty($key) || $key !== env('API_KEY')) {
+            return response()->json(['message' => '103'], 403);
+        }
+
         return $next($request);
     }
 }
