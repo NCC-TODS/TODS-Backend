@@ -2,6 +2,9 @@
 
 return [
 
+    // API Key for external services
+    'api_key' => env('API_KEY'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
