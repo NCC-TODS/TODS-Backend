@@ -13,7 +13,7 @@ Route::prefix('auth')->middleware('EnsureTokenIsValid')->group(function () {
 Route::group([
     'as' => 'nrp.',
     'prefix' => 'nrp',
-    'middleware' => ['auth:sanctum', 'EnsureTokenIsValid'],
+    'middleware' => ['auth:sanctum'],
 ], function () {
 
     // Fetch states list
