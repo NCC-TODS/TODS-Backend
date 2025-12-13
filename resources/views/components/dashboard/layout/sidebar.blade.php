@@ -28,9 +28,9 @@
                     data-accordion="false">
                     <li class="nav-header">سیستم</li>
                     <li class="nav-item">
-                        <a href="pages/mailbox/read-mail.html" class="nav-link">
-                            <i class="fa fa-street-view nav-icon"></i>
-                            <p>گزارش‌ها</p>
+                        <a href="{{ route('dashboard.clvm.show') }}" class="nav-link">
+                            <i class="fa fa-tag nav-icon"></i>
+                            <p>مدیریت نسخه</p>
                         </a>
                     </li>
                     <li class="nav-item has-treeview">
