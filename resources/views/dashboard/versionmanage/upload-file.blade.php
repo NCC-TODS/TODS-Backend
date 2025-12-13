@@ -18,10 +18,34 @@
                 <div class="tab-content p-0">
                     <div class="tab-pane active" id="new-version">
 
+
                         {{-- Upload new client version --}}
                         <form action="{{ route('dashboard.clvm.upload') }}" method="POST" enctype="multipart/form-data"
                             class="form-group mb-5">
                             @csrf
+
+                            @if (session('success'))
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert"
+                                        aria-hidden="true">&times;</button>
+                                    <h5><i class="icon fa fa-check"></i>ثبت شد</h5>
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            @if ($errors->any())
+                                <div class="alert alert-danger alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert"
+                                        aria-hidden="true">&times;</button>
+                                    <h5><i class="icon fa fa-check"></i>مشکل پیش آمد!</h5>
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                             <label for="exampleInputFile">بارگذاری نسخه جدید</label>
                             <div class="input-group">
                                 <div class="custom-file">
@@ -38,6 +62,19 @@
                                 </div>
                             </div>
                         </form>
+
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                document.querySelectorAll('.custom-file-input').forEach(function(input) {
+                                    input.addEventListener('change', function(e) {
+                                        let fileName = e.target.files[0]?.name || 'انتخاب فایل';
+                                        e.target.nextElementSibling.innerText = fileName;
+                                    });
+                                });
+                            });
+                        </script>
+
 
                     </div>
 
