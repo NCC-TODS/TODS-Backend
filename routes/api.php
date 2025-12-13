@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\NRP\ClientVersionApiController;
 use App\Http\Controllers\Api\NRP\FetchOveralFormController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +25,15 @@ Route::group([
 
     // ثبت گزارش جدید
     Route::post('/store-report', [\App\Http\Controllers\Api\NRP\NrpReportController::class, 'store']);
+});
+
+
+// Version endpoint
+Route::group([
+    'as' => 'clvm.',
+    'prefix' => 'clvm',
+], function () {
+
+    Route::get('/version', [ClientVersionApiController::class, 'latest']);
+    Route::get('/version/download', [ClientVersionApiController::class, 'download']);
 });
