@@ -64,10 +64,16 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => 'au
     // Version Manager | CLVM = Client Version Manage
     Route::group(['prefix' => 'clvm', 'as' => 'clvm.'], function () {
         // Show the CLVM Page
-        Route::get('/', [ClientVersionManageController::class, 'show'])->name('show');
+        Route::get('/version-manage', [ClientVersionManageController::class, 'index'])->name('index');
 
-        // Upload new file
-        Route::post('/upload', [ClientVersionManageController::class, 'upload'])
+
+        Route::post('/version-manage', [ClientVersionManageController::class, 'store'])
             ->name('upload');
+
+        Route::post('/version-manage/{clientVersion}/activate', [ClientVersionManageController::class, 'activate'])
+            ->name('activate');
+
+        Route::delete('/version-manage/{clientVersion}', [ClientVersionManageController::class, 'destroy'])
+            ->name('destroy');
     });
 });
