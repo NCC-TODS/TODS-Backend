@@ -3,33 +3,62 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClientVersion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ClientVersionManageController extends Controller
 {
-    // Show upload file form
-    public function show()
+    // نمایش لیست
+    public function index()
     {
-        return view('dashboard.versionmanage.upload-file');
+        $versions = ClientVersion::orderByDesc('created_at')->get();
+
+        return view('dashboard.versionmanage.upload-file', compact('versions'));
     }
 
-
-    // Upload new Client Version
-    public function upload(Request $request)
+    // آپلود
+    public function store(Request $request)
     {
         $request->validate([
-            'version' => 'required|string',
+            'version' => 'required|string|unique:client_versions,version',
             'apk' => 'required|file|mimes:apk,zip',
         ]);
 
-        $version = $request->input('version');
-        $fileName = 'nrp-' . $version . '.apk';
+        $fileName = 'nrp-' . $request->version . '.apk';
 
-        $request->file('apk')->storeAs(
-            'public/apks',
-            $fileName
+        $path = $request->file('apk')->storeAs(
+            'apks',
+            $fileName,
+            'public'
         );
 
-        return back()->with('success', 'APK uploaded successfully');
+        ClientVersion::create([
+            'version'   => $request->version,
+            'file_path' => $path,
+            'is_active' => false,
+        ]);
+
+        return back()->with('success', 'نسخه با موفقیت آپلود شد');
+    }
+
+    // فعال کردن نسخه
+    public function activate(ClientVersion $clientVersion)
+    {
+        ClientVersion::where('is_active', true)->update(['is_active' => false]);
+
+        $clientVersion->update(['is_active' => true]);
+
+        return back()->with('success', 'این نسخه فعال شد');
+    }
+
+    // حذف نسخه + فایل
+    public function destroy(ClientVersion $clientVersion)
+    {
+        Storage::disk('public')->delete($clientVersion->file_path);
+
+        $clientVersion->delete();
+
+        return back()->with('success', 'نسخه حذف شد');
     }
 }
