@@ -28,7 +28,7 @@
                     data-accordion="false">
                     <li class="nav-header">سیستم</li>
                     <li class="nav-item">
-                        <a href="{{ route('dashboard.clvm.show') }}" class="nav-link">
+                        <a href="{{ route('dashboard.clvm.index') }}" class="nav-link">
                             <i class="fa fa-tag nav-icon"></i>
                             <p>مدیریت نسخه</p>
                         </a>
