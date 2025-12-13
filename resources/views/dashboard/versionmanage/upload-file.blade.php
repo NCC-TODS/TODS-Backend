@@ -6,8 +6,8 @@
         <div class="card">
             <div class="card-header d-flex p-0">
                 <h3 class="card-title p-3">
-                    <i class="fa fa-pie-chart mr-1"></i>
-                    ورژن منیجر
+                    <i class="fa fa-tag mr-1"></i>
+                    مدیریت نسخه
                 </h3>
                 <ul class="nav nav-pills mr-auto p-2">
                     <li class="nav-item">
@@ -16,7 +16,32 @@
             </div>
             <div class="card-body">
                 <div class="tab-content p-0">
-                    <div class="tab-pane active" id="list-users">
+                    <div class="tab-pane active" id="new-version">
+
+                        {{-- Upload new client version --}}
+                        <form action="{{ route('dashboard.clvm.upload') }}" method="POST" enctype="multipart/form-data"
+                            class="form-group mb-5">
+                            @csrf
+                            <label for="exampleInputFile">بارگذاری نسخه جدید</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="apk" accept=".apk" class="custom-file-input" required>
+                                    <label class="custom-file-label" for="exampleInputFile">انتخاب فایل</label>
+                                </div>
+                                <div class="input-group-append">
+                                    <input type="text" name="version" class="input-group-text" placeholder="VERSION"
+                                        required>
+                                </div>
+
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">ثبت</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <div class="tab-pane active" id="list-versions">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -25,7 +50,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                     </div>
