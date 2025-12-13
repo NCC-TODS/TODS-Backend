@@ -63,6 +63,11 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => 'au
 
     // Version Manager | CLVM = Client Version Manage
     Route::group(['prefix' => 'clvm', 'as' => 'clvm.'], function () {
+        // Show the CLVM Page
         Route::get('/', [ClientVersionManageController::class, 'show'])->name('show');
+
+        // Upload new file
+        Route::post('/upload', [ClientVersionManageController::class, 'upload'])
+            ->name('upload');
     });
 });
