@@ -87,7 +87,42 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @forelse ($versions as $version)
+                                    <tr>
+                                        <td>
+                                            {{ $version->version }}
+                                            @if ($version->is_active)
+                                                <span class="badge badge-success">Active</span>
+                                            @endif
+                                        </td>
 
+                                        <td>
+                                            <a href="{{ Storage::url($version->file_path) }}" class="btn btn-sm btn-success"
+                                                download>
+                                                دانلود
+                                            </a>
+
+                                            @if (!$version->is_active)
+                                                <form action="{{ route('dashboard.clvm.activate', $version) }}"
+                                                    method="POST" style="display:inline">
+                                                    @csrf
+                                                    <button class="btn btn-sm btn-warning">فعال</button>
+                                                </form>
+                                            @endif
+
+                                            <form action="{{ route('dashboard.clvm.destroy', $version) }}" method="POST"
+                                                style="display:inline" onsubmit="return confirm('حذف شود؟')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-danger">حذف</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="text-center">نسخه‌ای وجود ندارد</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
