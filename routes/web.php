@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Dashboard\ClientVersionManageController;
 use App\Http\Controllers\Dashboard\UsermanageController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,5 +58,11 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => 'au
 
         Route::get('/create', [UsermanageController::class, 'show_create_user'])->name('show-create-user');
         Route::post('/create', [UsermanageController::class, 'create_user_action'])->name('create-user-action');
+    });
+
+
+    // Version Manager | CLVM = Client Version Manage
+    Route::group(['prefix' => 'clvm', 'as' => 'clvm.'], function () {
+        Route::get('/', [ClientVersionManageController::class, 'show'])->name('show');
     });
 });
